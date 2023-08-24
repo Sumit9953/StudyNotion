@@ -17,7 +17,9 @@ export default function Instructor() {
         setLoading(true)
         const instructorApiData = await getInstructorData(token)
         const result = await fetchInstructorCourses(token)
-        console.log(instructorApiData)
+
+        // console.log(instructorApiData)
+
         if (instructorApiData.length) setInstructorData(instructorApiData)
         if (result) {
           setCourses(result)
@@ -37,7 +39,8 @@ export default function Instructor() {
     )
   
     return (
-      <div>
+      <>
+
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-richblack-5">
             Hi {user?.firstName} 👋
@@ -46,6 +49,7 @@ export default function Instructor() {
             Let's start something new
           </p>
         </div>
+
         {loading ? (
           <div className="spinner"></div>
         ) : courses.length > 0 ? (
@@ -87,6 +91,7 @@ export default function Instructor() {
                 </div>
               </div>
             </div>
+            
             <div className="rounded-md bg-richblack-800 p-6">
               {/* Render 3 courses */}
               <div className="flex items-center justify-between">
@@ -95,6 +100,7 @@ export default function Instructor() {
                   <p className="text-xs font-semibold text-yellow-50">View All</p>
                 </Link>
               </div>
+
               <div className="my-4 flex items-start space-x-6">
                 {courses.slice(0, 3).map((course) => (
                   <div key={course._id} className="w-1/3">
@@ -122,6 +128,7 @@ export default function Instructor() {
                   </div>
                 ))}
               </div>
+              
             </div>
           </div>
         ) : (
@@ -136,6 +143,6 @@ export default function Instructor() {
             </Link>
           </div>
         )}
-      </div>
+      </>
     )
   }
