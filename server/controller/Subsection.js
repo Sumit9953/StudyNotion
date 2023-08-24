@@ -4,15 +4,14 @@ const { uploadImageToCloudinary } = require("../utils/imageUploader")
 
 exports.createSubSection = async (req, res) => {
   try {
-    const { sectionId, title, timeDuration, description } = req.body;
+    const { sectionId, title , description , timeDuration } = req.body;
 
     const video = req.files.videoFile;
 
-    if (!sectionId || !title || !timeDuration || !description || !video) {
+    if (!sectionId || !title || !description || !video || !timeDuration) {
       return res.status(400).json({
         success: false,
         message: "All fileds are required",
-        error: error.message,
       });
     }
 
@@ -59,7 +58,7 @@ exports.createSubSection = async (req, res) => {
 
 exports.updateSubSection = async (req, res) => {
   try {
-    const { sectionId, subSectionId, title, description } = req.body
+    const { sectionId, subSectionId, title, description ,timeDuration } = req.body
     const subSection = await SubSection.findById(subSectionId)
 
     if (!subSection) {
@@ -72,10 +71,14 @@ exports.updateSubSection = async (req, res) => {
     if (title !== undefined) {
       subSection.title = title
     }
+    if (timeDuration !== undefined) {
+      subSection.timeDuration = timeDuration
+    }
 
     if (description !== undefined) {
       subSection.description = description
     }
+
     if (req.files && req.files.video !== undefined) {
       const video = req.files.video
       const uploadDetails = await uploadImageToCloudinary(

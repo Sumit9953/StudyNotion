@@ -192,7 +192,7 @@ exports.login = async (req, res) => {
         accountType: user.accountType,
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "2h",
+        expiresIn: "24h",
       });
 
       user.token = token;
@@ -228,37 +228,64 @@ exports.login = async (req, res) => {
 //changePassword
 exports.changePassword = async (req, res) => {
   try {
-    const { oldPassword, password, confirmPassword } = req.body;
+    // Get user data from req.user
+    const userDetails = await User.findById(req.user.id)
 
-    if (!oldPassword || !password || !confirmPassword) {
-      return res.status(401).json({
-        success: false,
-        message: "all Fieled are required, please try again",
-      });
+    // Get old password, new password, and confirm new password from req.body
+    const { oldPassword, newPassword } = req.body
+
+    // Validate old password
+    const isPasswordMatch = await bcrypt.compare(
+      oldPassword,
+      userDetails.password
+    )
+    if (!isPasswordMatch) {
+      // If old password does not match, return a 401 (Unauthorized) error
+      return res
+        .status(401)
+        .json({ success: false, message: "The password is incorrect" })
     }
 
-    const user = await User.findOne({ password: oldPassword });
+    // Update password
+    const encryptedPassword = await bcrypt.hash(newPassword, 10)
+    const updatedUserDetails = await User.findByIdAndUpdate(
+      req.user.id,
+      { password: encryptedPassword },
+      { new: true }
+    )
 
-    if (!user) {
-      return res.status(401).json({
+    // Send notification email
+    try {
+      const emailResponse = await mailSender(
+        updatedUserDetails.email,
+        "Password for your account has been updated",
+        passwordUpdated(
+          updatedUserDetails.email,
+          `Password updated successfully for ${updatedUserDetails.firstName} ${updatedUserDetails.lastName}`
+        )
+      )
+      console.log("Email sent successfully:", emailResponse.response)
+    } catch (error) {
+      // If there's an error sending the email, log the error and return a 500 (Internal Server Error) error
+      console.error("Error occurred while sending email:", error)
+      return res.status(500).json({
         success: false,
-        message: "Old password don't match, please try again",
-      });
+        message: "Error occurred while sending email",
+        error: error.message,
+      })
     }
 
-    if (password !== confirmPassword) {
-      return res.status(401).json({
-        success: false,
-        message: "password and confirmPassword don't match, please try again",
-      });
-    }
-
-    user.password = password;
-
+    // Return success response
+    return res
+      .status(200)
+      .json({ success: true, message: "Password updated successfully" })
   } catch (error) {
+    // If there's an error updating the password, log the error and return a 500 (Internal Server Error) error
+    console.error("Error occurred while updating password:", error)
     return res.status(500).json({
-        success: false,
-        message: "Password not changed",
-      });
+      success: false,
+      message: "Error occurred while updating password",
+      error: error.message,
+    })
   }
-};
+}

@@ -1,4 +1,7 @@
 const Category = require("../models/Category");
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max)
+}
 
 exports.createCategory = async (req, res) => {
   try {
@@ -35,9 +38,7 @@ exports.showAllCategories = async (req, res) => {
   try {
 
     const allCategory = await Category.find(
-      {},
-      { name:true },
-      { description: true }
+      {}
     );
 
     return res.status(200).json({
@@ -99,7 +100,7 @@ exports.categoryPageDetails = async (req, res) => {
         ._id
     )
       .populate({
-        path: "courses",
+        path: "course",
         match: { status: "Published" },
       })
       .exec()
@@ -107,14 +108,15 @@ exports.categoryPageDetails = async (req, res) => {
     // Get top-selling courses across all categories
     const allCategories = await Category.find()
       .populate({
-        path: "courses",
+        path: "course",
         match: { status: "Published" },
         populate: {
           path: "instructor",
       },
       })
       .exec()
-    const allCourses = allCategories.flatMap((category) => category.courses)
+      
+    const allCourses = allCategories.flatMap((category) => category.course)
     const mostSellingCourses = allCourses
       .sort((a, b) => b.sold - a.sold)
       .slice(0, 10)

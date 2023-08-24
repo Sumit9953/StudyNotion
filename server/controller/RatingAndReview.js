@@ -8,7 +8,9 @@ exports.createRating = async(req,res) => {
         
         const userId = req.user.id;
 
-        const {rating , review , courseId} = req.body;
+        const {rating , reviews , courseId} = req.body;
+
+        console.log("rating , reviews , courseId" , rating , reviews , courseId);
 
         const courseDetails = await Course.findOne(
             {
@@ -37,7 +39,7 @@ exports.createRating = async(req,res) => {
     }
 
     const ratingReview = await RatingAndReview.create({
-        rating , review,
+        rating , reviews,
         course:courseId,
         user:userId
 
@@ -120,13 +122,15 @@ exports.getAllRating = async (req,res) => {
         .sort({rating: "desc"})
         .populate({
             path:"user",
-            select:"firstNamr lastName email image",
+            select:"firstName lastName email image",
         })
         .populate({
             path:"course",
             select:"courseName"
         })
         .exec()
+
+        console.log("All Rev", allReviews);
 
         return res.status(200).json({
             success:true,

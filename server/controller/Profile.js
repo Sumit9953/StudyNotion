@@ -5,7 +5,7 @@ const CourseProgress = require("../models/CourseProgress")
 const Course = require("../models/Course")
 const { uploadImageToCloudinary } = require("../utils/imageUploader")
 // const mongoose = require("mongoose")
-// const { convertSecondsToDuration } = require("../utils/secToDuration")
+const { convertSecondsToDuration } = require("../utils/sectToDuration")
 
 //update profile
 exports.updateProfile = async (req,res) => {
@@ -46,7 +46,6 @@ exports.updateProfile = async (req,res) => {
         return res.status(500).json({
             success: false,
             message:"Something went wrong while update Profile",
-            message: error.message,
           });
     }
 }
@@ -145,7 +144,7 @@ exports.updateDisplayPicture = async (req, res) => {
     }
   }
   
-  exports.getEnrolledCourses = async (req, res) => {
+exports.getEnrolledCourses = async (req, res) => {
     try {
       const userId = req.user.id
       let userDetails = await User.findOne({
@@ -161,21 +160,26 @@ exports.updateDisplayPicture = async (req, res) => {
           },
         })
         .exec()
+
       userDetails = userDetails.toObject()
       var SubsectionLength = 0
+
       for (var i = 0; i < userDetails.courses.length; i++) {
         let totalDurationInSeconds = 0
         SubsectionLength = 0
-        for (var j = 0; j < userDetails.courses[i].courseContent.length; j++) {
-          totalDurationInSeconds += userDetails.courses[i].courseContent[
-            j
-          ].subSection.reduce((acc, curr) => acc + parseInt(curr.timeDuration), 0)
+
+          for (var j = 0; j < userDetails.courses[i].courseContent.length; j++) {
+          totalDurationInSeconds += userDetails.courses[i].courseContent[j]
+          .subSection.reduce((acc, curr) => acc + parseInt(curr.timeDuration), 0)
+
           userDetails.courses[i].totalDuration = convertSecondsToDuration(
             totalDurationInSeconds
           )
+
           SubsectionLength +=
             userDetails.courses[i].courseContent[j].subSection.length
         }
+
         let courseProgressCount = await CourseProgress.findOne({
           courseID: userDetails.courses[i]._id,
           userId: userId,
@@ -211,12 +215,12 @@ exports.updateDisplayPicture = async (req, res) => {
     }
   }
   
-  exports.instructorDashboard = async (req, res) => {
+exports.instructorDashboard = async (req, res) => {
     try {
       const courseDetails = await Course.find({ instructor: req.user.id })
   
       const courseData = courseDetails.map((course) => {
-        const totalStudentsEnrolled = course.studentsEnroled.length
+        const totalStudentsEnrolled = course.studentsEnrolled.length
         const totalAmountGenerated = totalStudentsEnrolled * course.price
   
         // Create a new object with the additional fields

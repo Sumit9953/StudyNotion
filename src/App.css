@@ -69,7 +69,6 @@ details > summary::-webkit-details-marker {
   filter: blur(34px);
   transform: matrix(1, 0, -0.03, 1, 0, 0);
 }
-
 .codeblock2 {
   position: absolute;
   width: 372.95px;
@@ -87,7 +86,6 @@ details > summary::-webkit-details-marker {
   filter: blur(34px);
   transform: matrix(1, 0, -0.03, 1, 0, 0);
 }
-
 .code-border {
   border: 2px solid;
   border-image-slice: 1;
