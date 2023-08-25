@@ -19,7 +19,7 @@ exports.createCategory = async (req, res) => {
       description: description,
     });
 
-    console.log(categoryDetails);
+    // console.log(categoryDetails);
 
     return res.status(200).json({
       success: true,
@@ -60,7 +60,7 @@ exports.showAllCategories = async (req, res) => {
 exports.categoryPageDetails = async (req, res) => {
   try {
     const { categoryId } = req.body
-    console.log("PRINTING CATEGORY ID: ", categoryId);
+    // console.log("PRINTING CATEGORY ID: ", categoryId);
     // Get courses for the specified category
     const selectedCategory = await Category.findById(categoryId)
       .populate({
@@ -70,7 +70,7 @@ exports.categoryPageDetails = async (req, res) => {
       })
       .exec()
 
-      console.log("selectedCategory:" , selectedCategory);
+      // console.log("selectedCategory:" , selectedCategory);
 
     //console.log("SELECTED COURSE", selectedCategory)
     // Handle the case when the category is not found
@@ -81,7 +81,7 @@ exports.categoryPageDetails = async (req, res) => {
         .json({ success: false, message: "Category not found" })
     }
     // Handle the case when there are no courses
-    console.log("length:" , selectedCategory.course.length);
+    // console.log("length:" , selectedCategory.course.length);
 
     if (selectedCategory.course.length === 0) {
       console.log("No courses found for the selected category.")
